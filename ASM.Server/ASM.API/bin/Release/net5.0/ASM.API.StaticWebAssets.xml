@@ -1,0 +1,5 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="/" Path="D:\HK_Summer_2021\Block_2\Lap_trinh_C#6\PS13663_PhamLyHung_UC15302_NET106_Asm\ASM.Server\ASM.API\obj\Release\net5.0\scopedcss\bundle\" />
+  <ContentRoot BasePath="_content/ASM.Share" Path="D:\HK_Summer_2021\Block_2\Lap_trinh_C#6\PS13663_PhamLyHung_UC15302_NET106_Asm\ASM.Share\obj\Release\net5.0\scopedcss\projectbundle\" />
+  <ContentRoot BasePath="_content/ASM.Share" Path="D:\HK_Summer_2021\Block_2\Lap_trinh_C#6\PS13663_PhamLyHung_UC15302_NET106_Asm\ASM.Share\wwwroot\" />
+</StaticWebAssets>

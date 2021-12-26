@@ -1,0 +1,101 @@
+﻿@page "/login"
+@using System.Web;
+@using System.ComponentModel.DataAnnotations;
+@layout LoginLayout;
+@inject NavigationManager navigation
+@attribute [AllowAnonymous] 
+
+<div class="container">
+    <div class="card card-login mx-auto text-center bg-dark">
+        <div class="card-header mx-auto bg-dark">
+            <span> <img src="/images/simplestore.png" class="float-left w-25" alt="Logo"> Simple Quán</span><br />
+            <span class="logo_title mt-5 h3 text-warning"> Đăng nhập Simple Quán</span>
+        </div>
+        <div class="card-body">
+            <div class="text-danger" asp-validation-summary="All"></div>
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div class="input-group form-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                </div>
+                <input type="text" id="username" placeholder="Tài khoản" @bind="@userName" class="form-control" />
+            </div>
+
+            <div class="input-group form-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                </div>
+                <input type="password" placeholder="Mật khẩu" @bind="@password" @onkeypress="Enter" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <button name="btn" type="submit" class="btn btn-outline-danger float-right login_btn" @onclick="CheckLogin"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@((MarkupString)error)</div>
+        }
+    </div>
+</div>
+
+@*<div class="col-md-4 offset-md-3 mt-5">
+    <div class="card">
+        <h4 class="card-header">Đăng nhập</h4>
+        <div class="card-body">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Tài khoản" @bind="@userName" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Mật khẩu" @bind="@password" @onkeypress="Enter" class="form-control"/>
+            </div>
+            <button class="ml-md-auto btn btn-primary" @onclick="CheckLogin">Đăng nhập</button>
+        </div>            
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@((MarkupString)error)</div>
+        }
+    </div>
+</div>*@
+
+@code {
+    //private bool loading;
+    private string error;
+
+    string userName = "";
+    string password = "";
+
+    private string Encode(string param)
+    {
+        return HttpUtility.UrlEncode(param);
+    }
+
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            if (password != "")
+            {
+                CheckLogin();
+            }
+        }
+    }
+
+    private void CheckLogin()
+    {
+        error = "";
+        if (userName == "")
+        {
+            error = " - Bạn cần nhập tài khoản!";
+        }
+        if (password == "")
+        {
+            error += (error == "" ? "" : "<br/>") + " - Bạn cần nhập mật khẩu!";
+        }
+        if (error == "")
+        {
+            navigation.NavigateTo("CheckLogin?paramUserName=" + @Encode(@userName)
+            + "&paramPassword=" + @Encode(@password), true);
+        }
+    }
+}

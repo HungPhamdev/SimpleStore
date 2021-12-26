@@ -1,0 +1,73 @@
+﻿@page "/FindDonhang/{tongTien}"
+
+@using ASM.Share.Models
+@inject ASM.Share.Models.IDonhangSvc _donhangSvc
+
+<h1 class="text-info font-weight-bold"><i class="fas fa-list-ul"></i> Danh sách đơn hàng tìm kiếm</h1>
+
+<div class="d-flex justify-content-center h-100">
+    <div class="searchbar">
+        <input class="search_input_sv" type="text" @bind="@tongTien" placeholder="Tìm kiếm bằng tổng tiền...">
+        <a href="/FindDonhang/@tongTien" class="search_icon"><i class="fas fa-search"></i></a>
+    </div>
+</div>
+
+@if (donhangs == null)
+{
+    <p><em><img src="images/circle.gif" width="1200" height="600" /></em></p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Ghi chú</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in donhangs)
+            {
+                <tr>
+                    <td>@item.Khachhang.EmailAddress</td>
+                    <td>@item.Ngaydat</td>
+                    <td>@item.Tongtien</td>
+                    <td>
+                        @if (item.TrangthaiDonhang == TrangthaiDonhang.Moidat)
+                        {
+                            <span>Mới đặt</span>
+                        }
+                        @if (item.TrangthaiDonhang == TrangthaiDonhang.Danggiao)
+                        {
+                            <span>Đang giao</span>
+                        }
+                        @if (item.TrangthaiDonhang == TrangthaiDonhang.Dagiao)
+                        {
+                            <span>Đã giao</span>
+                        }
+                    </td>
+                    <td>@item.Ghichu</td>
+                    <td>
+                        <a class="btn btn-primary text-white font-weight-bold" href="/DonhangDialog/@item.DonhangID"><i class="fas fa-edit"></i></a> |
+                        <a class="btn btn-info font-weight-bold" href="/DonhangDetail/@item.DonhangID"><i class="fas fa-info-circle"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public string tongTien { get; set; }
+    public List<Donhang> donhangs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        donhangs = await _donhangSvc.FindDonHangAllAsync(Convert.ToDouble(tongTien));
+    }
+}

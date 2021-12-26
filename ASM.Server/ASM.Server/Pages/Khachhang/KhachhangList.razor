@@ -1,0 +1,74 @@
+﻿@page "/khachhanglist"
+
+@using ASM.Share.Models
+@inject ASM.Share.Models.IKhachhangSvc _khachhangSvc
+
+<h1 class="text-info font-weight-bold"><i class="fas fa-list-ul"></i> Danh sách khách hàng</h1>
+
+<div class="d-flex justify-content-center h-100">
+    <div class="searchbar">
+        <input class="search_input_sv" type="text" @bind="@fullName" placeholder="Tìm kiếm bằng tên khách hàng...">
+        <a href="/FindKhachhang/@fullName" class="search_icon"><i class="fas fa-search"></i></a>
+    </div>
+</div>
+
+@if (check == true)
+{
+    <h2 class="alert alert-success font-weight-bold h2">Xóa khách hàng thành công!</h2>
+}
+
+@if (khachhangs == null)
+{
+    <p><em><img src="images/circle.gif" width="1200" height="600" /></em></p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Họ và tên</th>
+                <th>Ngày sinh</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th>Mật khẩu</th>
+                <th>Mô tả</th>
+                <th><a class="btn btn-outline-success font-weight-bold p-10" href="/KhachhangDialog/0"><i class="fa fa-plus-square"></i> Thêm khách hàng mới</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in khachhangs)
+            {
+                <tr>
+                    <td>@item.FullName</td>
+                    <td>@item.Ngaysinh</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.EmailAddress</td>
+                    <td>@item.Password</td>
+                    <td>@item.Mota</td>
+                    <td>
+                        <a class="btn btn-info font-weight-bold" href="/KhachhangDialog/@item.KhachhangID"><i class="fas fa-edit"></i></a> |
+                        <a class="btn btn-danger text-white font-weight-bold" style="cursor:pointer" @onclick="@(()=>Delete(item.KhachhangID))"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public string fullName { get; set; }
+    public List<Khachhang> khachhangs;
+    public bool check { get; set; }
+
+    protected override void OnInitialized()
+    {
+        khachhangs = _khachhangSvc.GetKhachhangAll();
+    }
+
+    private void Delete(int id)
+    {
+        _khachhangSvc.DeleteKhachhang(id);
+        check = true;
+        khachhangs = _khachhangSvc.GetKhachhangAll();
+    }
+}

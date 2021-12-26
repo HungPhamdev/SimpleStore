@@ -1,0 +1,95 @@
+﻿@page "/DonhangDetail/{id}"
+@using ASM.Share.Models
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@inject ASM.Share.Models.IDonhangSvc _donhangSvc
+@inject NavigationManager navigation
+@inject IWebHostEnvironment env
+
+<div class="row">
+    <h2 class="col-10 h2 text-info font-weight-bold"><i class="fas fa-info-circle"></i> Chi tiết đơn hàng</h2>
+    <button type="submit" class="col-2 btn btn-info font-weight-bold" @onclick="@Cancel"><i class="fas fa-arrow-circle-left"></i> Quay lại</button>
+</div>
+<hr />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Khách hàng</dt>
+        <dd class="col-sm-10">
+            @model.Khachhang.EmailAddress - @model.Khachhang.FullName
+        </dd>
+        <dt class="col-sm-2">Ngày đặt</dt>
+        <dd class="col-sm-10">
+            @model.Ngaydat
+        </dd>
+        <dt class="col-sm-2">Tổng tiền</dt>
+        <dd class="col-sm-10">
+            @model.Tongtien
+        </dd>
+        <dt class="col-sm-2">Trạng thái</dt>
+        <dd class="col-sm-10">
+            @if (model.TrangthaiDonhang == TrangthaiDonhang.Moidat)
+            {
+                <span>Mới đặt</span>
+            }
+            @if (model.TrangthaiDonhang == TrangthaiDonhang.Danggiao)
+            {
+                <span>Đang giao</span>
+            }
+            @if (model.TrangthaiDonhang == TrangthaiDonhang.Dagiao)
+            {
+                <span>Đã giao</span>
+            }
+        </dd>
+        <dt class="col-sm-2">Ghi chú</dt>
+        <dd class="col-sm-10">
+            @model.Ghichu
+        </dd>
+    </dl>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Món ăn</th>
+                <th>Hình ảnh</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th>Ghi chú</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in model.DonhangChitiets)
+            {
+                <tr>
+                    <td>@item.MonAn.Name</td>
+                    <td><img src="images/monan/@item.MonAn.Hinh" style="width:150px" /></td>
+                    <td>@item.Soluong</td>
+                    <td>@item.Thanhtien</td>
+                    <td>@item.Ghichu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public Donhang model;
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(id) || id == "0")
+        {
+            navigation.NavigateTo("donhanglist", true);
+        }
+        else
+        {
+            model = _donhangSvc.GetDonhang(int.Parse(id));
+        }
+    }
+
+    private void Cancel()
+    {
+        navigation.NavigateTo("DonhangList", true);
+    }
+}

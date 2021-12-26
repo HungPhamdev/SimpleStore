@@ -1,0 +1,124 @@
+﻿@page "/khachhangdialog/{id}"
+@using ASM.Share.Models
+@inject ASM.Share.Models.IKhachhangSvc _khachhangSvc
+@inject NavigationManager navigation
+
+
+<h3 class="@Style_T"><i class="@Icon_T"></i> @TieuDe</h3>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@khachhang" OnValidSubmit="@SubmitForm">
+            <DataAnnotationsValidator />
+            <input type="hidden" @bind="khachhang.KhachhangID" />
+            <div class="form-group">
+                <label class="control-label">Họ và tên</label>
+                <input @bind="khachhang.FullName" class="form-control" />
+                <ValidationMessage For="@(()=>khachhang.FullName)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Ngày sinh</label>
+                <input type="date" @bind="khachhang.Ngaysinh" class="form-control" />
+                <ValidationMessage For="@(()=>khachhang.Ngaysinh)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Số điện thoại</label>
+                <input type="number" @bind="khachhang.PhoneNumber" class="form-control" />
+                <ValidationMessage For="@(()=>khachhang.PhoneNumber)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Email</label>
+                <input @bind="khachhang.EmailAddress" class="form-control" />
+                <ValidationMessage For="@(()=>khachhang.EmailAddress)" />
+                @if (checkEmail == true)
+                {
+                    <span class="text-danger">Email đã tồn tại vui lòng nhập email khác!</span>
+                }
+            </div>
+            <div class="form-group">
+                <label class="control-label">Mật khẩu</label>
+                <input type="password" @bind="khachhang.Password" class="form-control" />
+                <ValidationMessage For="@(()=>khachhang.Password)" />
+            </div>
+            @if (khachhang.KhachhangID == 0)
+            {
+                <div class="form-group">
+                    <label class="control-label">Nhập lại mật khẩu</label>
+                    <input type="password" @bind="khachhang.ConfirmPassword" class="form-control" />
+                    <ValidationMessage For="@(()=>khachhang.ConfirmPassword)" />
+                </div>
+            }
+            <div class="form-group">
+                <label class="control-label">Mô tả</label>
+                <input @bind="khachhang.Mota" class="form-control" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="@Style_A"><i class="@Icon_A"></i> @Action</button>
+                <button type="submit" class="btn btn-info font-weight-bold" @onclick="@Cancel"><i class="fas fa-arrow-circle-left"></i> Thoát</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    private ASM.Share.Models.Khachhang khachhang { get; set; }
+    private string TieuDe = "";
+    private string Style_T = "";
+    private string Icon_T = "";
+    private string Action = "";
+    private string Style_A = "";
+    private string Icon_A = "";
+    private bool checkEmail = false;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(id) || id == "0")
+        {
+            TieuDe = "Thêm khách hàng";
+            Style_T = "h2 text-info font-weight-bold";
+            Icon_T = "fas fa-user-plus";
+            Action = "Tạo";
+            Style_A = "btn btn-primary font-weight-bold text-white";
+            Icon_A = "fas fa-plus-circle";
+            khachhang = new ASM.Share.Models.Khachhang();
+        }
+        else
+        {
+            TieuDe = "Chỉnh sửa khách hàng";
+            Style_T = "h2 text-info font-weight-bold";
+            Icon_T = "fas fa-user-edit";
+            Action = "Lưu";
+            Style_A = "btn btn-warning font-weight-bold text-primary";
+            Icon_A = "fas fa-save";
+            khachhang = _khachhangSvc.GetKhachhang(int.Parse(id));
+        }
+    }
+
+    private void SubmitForm()
+    {
+        if (khachhang.KhachhangID == 0)
+        {
+            if (_khachhangSvc.checkEmail(khachhang.EmailAddress))
+            {
+                checkEmail = true;
+            }
+            else
+            {
+                _khachhangSvc.AddKhachhang(khachhang);
+            }
+        }
+        else
+        {
+            _khachhangSvc.EditKhachhang(khachhang.KhachhangID, khachhang);
+        }
+        navigation.NavigateTo("KhachhangList");
+    }
+
+    private void Cancel()
+    {
+        navigation.NavigateTo("KhachhangList", true);
+    }
+
+}

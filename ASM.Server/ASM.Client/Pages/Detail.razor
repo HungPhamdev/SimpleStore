@@ -1,0 +1,108 @@
+﻿@page "/Detail/{id}"
+@using System.Net;
+@using ASM.Share.Models;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@layout WebLayout;
+@inject NavigationManager navigation
+@inject Blazored.SessionStorage.ISyncSessionStorageService sessionStorage
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject IJSRuntime JSRuntime
+
+<h1 class="text-info h1 font-weight-bold"><i class="fas fa-info-circle"></i> Chi tiết đơn hàng</h1>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Ngày đặt</dt>
+        <dd class="col-sm-10">@donhang.Ngaydat</dd>
+        <dt class="col-sm-2">Tổng tiền</dt>
+        <dd class="col-sm-10">@donhang.Tongtien</dd>
+        <dt class="col-sm-2">Trạng thái</dt>
+        <dd class="col-sm-10">
+                @if (donhang.TrangthaiDonhang == TrangthaiDonhang.Moidat)
+                {
+                    <span>Mới đặt</span>
+                }
+                @if (donhang.TrangthaiDonhang == TrangthaiDonhang.Danggiao)
+                {
+                    <span>Đang giao</span>
+                }
+                @if (donhang.TrangthaiDonhang == TrangthaiDonhang.Dagiao)
+                {
+                    <span>Đã giao</span>
+                }
+            </dd>
+        <dt class="col-sm-2">Ghi chú</dt>
+        <dd class="col-sm-10">@donhang.Ghichu</dd>
+    </dl>
+</div>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Món ăn</th>
+            <th>Hình ảnh</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+            <th>Ghi chú</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in listDonhang)
+        {
+            @if (item != null) 
+            { 
+        <tr>
+            <td>@item.MonAn.Name</td>
+            <td>
+            @{temp = imgUrl + item.MonAn.Hinh;}
+                <img src="@temp" style="width:150px" />
+            </td>
+            <td>@item.Soluong</td>
+            <td>@item.Thanhtien</td>
+            <td>@item.Ghichu</td>
+        </tr>
+            }            
+        }
+    </tbody>
+</table>
+<div>
+    <a href="/" class="ml-2 btn btn-info font-weight-bold" style="text-decoration:none;"><i class="fas fa-arrow-circle-left"></i> Quay lại</a> 
+    <a href="/history" class="ml-2 btn btn-success font-weight-bold" style="text-decoration:none;"><i class="fas fa-history"></i> Lịch sử</a>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    protected string temp = "";
+    protected string imgUrl = "";
+    public Donhang donhang;
+    public List<DonhangChitiet> listDonhang = new List<DonhangChitiet>();
+    public List<DonhangChitiet> donhangChitiets { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(id) || id == "0")
+        {
+            navigation.NavigateTo("/History", true);
+        }
+        else
+        {
+            var apiUrl = config.GetSection("API")["APIUrl"].ToString();
+            imgUrl = config.GetSection("API")["ImgUrl"].ToString();
+            var accessToken = sessionStorage.GetItem<string>("AccessToken");
+            donhang = new Donhang();
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+                client.BaseAddress = new Uri(apiUrl);
+                using(var response = await client.GetAsync("DonhangChitiet/?id=" + id))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    donhang = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Donhang>>(apiResponse)[0];
+                    listDonhang = donhang.DonhangChitiets;
+                }
+            }
+        }
+    }
+}

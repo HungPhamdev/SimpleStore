@@ -1,0 +1,83 @@
+﻿@page "/Donhangdialog/{id}"
+@using ASM.Share.Models
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@inject ASM.Share.Models.IDonhangSvc _donhangSvc
+@inject NavigationManager navigation
+@inject IWebHostEnvironment env
+
+
+<h2 class="h2 text-info font-weight-bold"><i class="fas fa-edit"></i> @TieuDe</h2>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@donhang" OnValidSubmit="@SubmitForm">
+            <DataAnnotationsValidator />
+            <input type="hidden" @bind="donhang.DonhangID" />
+            <div class="form-group">
+                <label class="control-label">Khách hàng</label>
+                <input @bind="donhang.Khachhang.EmailAddress" class="form-control" disabled="disabled" />
+                <input @bind="donhang.KhachhangID" class="form-control" style="display:none" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Ngày đặt</label>
+                <input type="date" @bind="donhang.Ngaydat" class="form-control" />
+                <ValidationMessage For="@(()=>donhang.Ngaydat)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Tổng tiền</label>
+                <input type="number" @bind="donhang.Tongtien" class="form-control" />
+                <ValidationMessage For="@(()=>donhang.Tongtien)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Trạng thái</label>
+                <InputSelect @bind-Value="@donhang.TrangthaiDonhang" class="form-control">
+                    @foreach (var trangthai in Enum.GetValues(typeof(TrangthaiDonhang)))
+                    {
+                        <option value="@trangthai">@trangthai</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label @bind="donhang.Ghichu" class="control-label"></label>
+                <input @bind="donhang.Ghichu" class="form-control" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-warning text-success font-weight-bold"><i class="fas fa-save"></i> Lưu</button>
+                <button type="submit" class="btn btn-info font-weight-bold" @onclick="@Cancel"><i class="fas fa-arrow-circle-left"></i> Thoát</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    private ASM.Share.Models.Donhang donhang { get; set; }
+    private string TieuDe = "";
+    //IReadOnlyList<IBrowserFile> selectedFiles;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(id) || id == "0")
+        {
+            navigation.NavigateTo("donhangList", true);
+        }
+        else
+        {
+            TieuDe = "Chỉnh sửa đơn hàng";
+            donhang = _donhangSvc.GetDonhang(int.Parse(id));
+        }
+    }
+
+    private async Task SubmitForm()
+    {
+        await _donhangSvc.EditDonhangAsync(donhang.DonhangID, donhang);
+        navigation.NavigateTo("DonhangList", true);
+    }
+
+    private void Cancel()
+    {
+        navigation.NavigateTo("DonhangList", true);
+    }
+}

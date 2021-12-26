@@ -1,0 +1,134 @@
+﻿@page "/nguoidungdialog/{id}"
+@using ASM.Share.Models
+@inject ASM.Share.Models.INguoidungSvc _nguoidungSvc
+@inject NavigationManager navigation
+
+
+<h3 class="@Style_T"><i class="@Icon_T"></i> @TieuDe</h3>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@nguoidung" OnValidSubmit="@SubmitForm">
+            <DataAnnotationsValidator />
+            <input type="hidden" @bind="nguoidung.NguoidungID" />
+            <div class="form-group">
+                <label class="control-label">Tên đăng nhập</label>
+                <input @bind="nguoidung.UserName" class="form-control" />
+                <ValidationMessage For="@(()=>nguoidung.UserName)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Họ và tên</label>
+                <input @bind="nguoidung.FullName" class="form-control" />
+                <ValidationMessage For="@(()=>nguoidung.FullName)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Email</label>
+                <input @bind="nguoidung.Email" class="form-control" />
+                <ValidationMessage For="@(()=>nguoidung.Email)" />
+                @if (checkEmail == true)
+                {
+                    <span class="text-danger">Email đã tồn tại vui lòng nhập email khác!</span>
+                }
+            </div>
+            <div class="form-group">
+                <label class="control-label">Chức danh</label>
+                <input @bind="nguoidung.Title" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Ngày sinh</label>
+                <input type="date" @bind="nguoidung.DOB" class="form-control" />
+                <ValidationMessage For="@(()=>nguoidung.DOB)" />
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" @bind="nguoidung.Admin" /> Quản trị
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" @bind="nguoidung.Locked" /> Sử dụng
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="nguoidung.Password" class="control-label">Mật khẩu</label>
+                <input type="password" @bind="nguoidung.Password" class="form-control" />
+                <ValidationMessage For="@(()=>nguoidung.Password)" />
+            </div>
+            @if (nguoidung.NguoidungID == 0)
+            {
+                <div class="form-group">
+                    <label for="nguoidung.ConfirmPassword" class="control-label">Nhập lại mật khẩu</label>
+                    <input type="password" @bind="nguoidung.ConfirmPassword" class="form-control" />
+                    <ValidationMessage For="@(()=>nguoidung.ConfirmPassword)" />
+                </div>
+            }
+            <div class="form-group">
+                <button type="submit" class="@Style_A"><i class="@Icon_A"></i> @Action</button>
+                <button type="submit" class="btn btn-info font-weight-bold" @onclick="@Cancel"><i class="fas fa-arrow-circle-left"></i> Thoát</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    private ASM.Share.Models.Nguoidung nguoidung { get; set; }
+    private string TieuDe = "";
+    private string Style_T = "";
+    private string Icon_T = "";
+    private string Action = "";
+    private string Style_A = "";
+    private string Icon_A = "";
+    private bool checkEmail = false;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(id) || id == "0")
+        {
+            TieuDe = "Thêm người dùng";
+            Style_T = "h2 text-info font-weight-bold";
+            Icon_T = "fas fa-user-plus";
+            Action = "Tạo";
+            Style_A = "btn btn-primary font-weight-bold text-white";
+            Icon_A = "fas fa-plus-circle";
+            nguoidung = new ASM.Share.Models.Nguoidung();
+        }
+        else
+        {
+            TieuDe = "Chỉnh sửa người dùng";
+            Style_T = "h2 text-info font-weight-bold";
+            Icon_T = "fas fa-user-edit";
+            Action = "Lưu";
+            Style_A = "btn btn-warning font-weight-bold text-success";
+            Icon_A = "fas fa-save";
+            nguoidung = _nguoidungSvc.GetNguoidung(int.Parse(id));
+        }
+    }
+
+    private void SubmitForm()
+    {
+        if (nguoidung.NguoidungID == 0)
+        {
+            if (_nguoidungSvc.checkEmail(nguoidung.Email))
+            {
+                checkEmail = true;
+            }
+            else
+            {
+                _nguoidungSvc.AddNguoidung(nguoidung);
+            }
+        }
+        else
+        {
+            _nguoidungSvc.EditNguoidung(nguoidung.NguoidungID, nguoidung);
+        }
+        navigation.NavigateTo("NguoidungList");
+    }
+
+    private void Cancel()
+    {
+        navigation.NavigateTo("NguoidungList", true);
+    }
+
+}

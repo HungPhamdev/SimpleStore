@@ -1,0 +1,40 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navigation
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main">
+        <div class="top-row px-4 bg-warning">
+            <LoginControl />
+        </div>
+
+        <div class="content px-4">
+            <AuthorizeView>
+                <Authorized>
+                    @Body
+                    @*code onmitted for brevity*@
+                </Authorized>
+                <NotAuthorized>
+                    @Body
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+</div>
+
+@code{
+    [CascadingParameter] protected Task<AuthenticationState> AuthState { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        // Context.User.Identity.Name
+        base.OnInitialized();
+        var user = (await AuthState).User;
+        if (!user.Identity.IsAuthenticated)
+        {
+            navigation.NavigateTo($"Login?returnUrl={Uri.EscapeDataString(navigation.Uri)}");
+        }
+    }
+}

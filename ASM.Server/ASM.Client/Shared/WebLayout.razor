@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow" style="background-color:khaki">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" href="/"><img src="/images/simplestore.png" style="width:60px" /></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls=""
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <WebLoginPartial />
+                <div class="d-flex justify-content-center h-100">
+                    <div class="searchbar">
+                        <input class="search_input" type="text" @bind="@tenMon" placeholder="Tìm kiếm bằng tên món...">
+                        <a href="/FindFood/@tenMon" class="search_icon"><i class="fas fa-search"></i></a>
+                    </div>
+                </div>
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-link text-dark font-weight-bold"><a href="/" style="text-decoration:none"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li class="nav-link text-dark font-weight-bold"><a href="/Foods" style="text-decoration:none"><i class="fas fa-utensils"></i> Món ăn</a></li>
+                    <li class="nav-link text-dark font-weight-bold"><a href="/Combos" style="text-decoration:none"><i class="fas fa-chart-pie"></i> Combo</a></li>
+                    <li class="nav-link text-dark font-weight-bold"><a href="/Drinks" style="text-decoration:none"><i class="fas fa-wine-bottle"></i> Nước uống</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div style="background-color: beige; height: 670px;">
+    <div class="container" style="background-color:beige">
+        <main class="pb-3" role="main">@Body</main>
+    </div>
+</div>
+
+<footer class="border-top footer text-dark" style="background-color:darkkhaki; height: 50px;">
+    <div class="container" style="margin-top:11px;">
+        &copy; 2021 - <a href="/">Simple Quán</a> - Đã đăng ký bản quyền.
+    </div>
+</footer>
+
+@code
+{ 
+    public string tenMon { get; set; }
+}

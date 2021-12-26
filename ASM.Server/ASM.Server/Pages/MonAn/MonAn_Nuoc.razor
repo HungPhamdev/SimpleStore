@@ -1,0 +1,104 @@
+﻿@page "/Monan_Nuoc"
+
+@using ASM.Share.Models
+@inject ASM.Share.Models.IMonAnSvc _monAnSvc
+
+<h1 class="text-info font-weight-bold"><i class="fas fa-list-ul"></i> Danh sách nước uống</h1>
+
+<div class="row mb-3">
+    <div class="d-flex justify-content-center h-100 col-5">
+        <div class="searchbar">
+            <input class="search_input" type="text" @bind="@tenMon" placeholder="Tìm kiếm bằng tên món...">
+            <a href="/FindMonAn/@tenMon" class="search_icon"><i class="fas fa-search"></i></a>
+        </div>
+    </div>
+    <div class="col-1"></div>
+    <select class="custom-select col-5" onchange="location = this.value;">
+        <option selected>Chọn thể loại...</option>
+        <option value="/Monan_Mon">Món ăn</option>
+        <option value="/Monan_Combo">Combo</option>
+        <option value="/Monan_Nuoc">Nước uống</option>
+    </select>
+</div>
+
+@if (check == true)
+{
+    <h2 class="alert alert-success font-weight-bold h2">Xóa món ăn thành công!</h2>
+}
+
+
+@if (monAns == null)
+{
+<p><em><img src="images/foodloader.gif" width="1200" height="600" /></em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tên món</th>
+                <th>Giá</th>
+                <th>Phân loại</th>
+                <th>Hình ảnh</th>
+                <th>Trạng thái</th>
+                <th><a class="btn btn-outline-success font-weight-bold p-10" href="/MonAnDialog/0"><i class="fa fa-plus-square"></i> Thêm món ăn mới</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in monAns)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Gia</td>
+                    <td>
+                        @if (@item.Phanloai == Phanloai.Monan)
+                        {
+                            <span>Món ăn</span>
+                        }
+                        @if (@item.Phanloai == Phanloai.Nuoc)
+                        {
+                            <span>Nước</span>
+                        }
+                        @if (@item.Phanloai == Phanloai.Combo)
+                        {
+                            <span>Combo</span>
+                        }
+                    </td>
+                    <td><img src="images/monan/@item.Hinh" style="width:150px" /></td>
+                    <td>
+                        @if (@item.Trangthai == true)
+                        {
+                            <span>Đang phục vụ</span>
+                        }
+                        else
+                        {
+                            <span>Ngừng phục vụ</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-info font-weight-bold" href="/MonAnDialog/@item.MonAnID"><i class="fas fa-edit"></i></a> |
+                        <a class="btn btn-danger text-white font-weight-bold" style="cursor:pointer" @onclick="@(()=>Delete(item.MonAnID))"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public string tenMon { get; set; }
+    public List<MonAn> monAns;
+    public bool check { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        monAns = await _monAnSvc.GetMonAnAll_NuocAsync();
+    }
+
+    private void Delete(int id)
+    {
+        _monAnSvc.DeleteMonAn(id);
+        check = true;
+        monAns = _monAnSvc.GetMonAnAll();
+    }
+}

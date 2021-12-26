@@ -1,0 +1,83 @@
+﻿@page "/nguoidunglist"
+
+@using ASM.Share.Models
+@inject ASM.Share.Models.INguoidungSvc _nguoidungSvc
+
+<h1 class="text-info font-weight-bold"><i class="fas fa-list-ul"></i> Danh sách người dùng</h1>
+
+<div class="d-flex justify-content-center h-100">
+    <div class="searchbar">
+        <input class="search_input_sv" type="text" @bind="@content" placeholder="Tìm kiếm tại đây...">
+        <a href="/FindNguoiDung/@content" class="search_icon"><i class="fas fa-search"></i></a>
+    </div>
+</div>
+
+@if (check == true)
+{
+    <h2 class="alert alert-success font-weight-bold h2">Xóa người dùng thành công!</h2>
+}
+
+@if (nguoidungs == null)
+{
+    <p><em><img src="images/circle.gif" width="1200" height="600" /></em></p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Tên đăng nhập</th>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th>Chức danh</th>
+                @*<th>Ngày sinh</th>*@
+                <th>Vai trò</th>
+                @*<th>Trạng thái</th>*@
+                <th><a class="btn btn-outline-success font-weight-bold p-10" href="/NguoidungDialog/0"><i class="fa fa-plus-square"></i> Thêm người dùng mới</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in nguoidungs)
+            {
+                <tr>
+                    <td>@item.UserName</td>
+                    <td>@item.FullName</td>
+                    <td>@item.Email</td>
+                    <td>@item.Title</td>
+                    <td>@item.Role</td>
+                    @*<td>
+                            @if (item.Locked)
+                            {
+                                <span>Khóa</span>
+                            }
+                        </td>*@
+                    <td>
+                        <a class="btn btn-info font-weight-bold" href="/NguoidungDialog/@item.NguoidungID"><i class="fas fa-edit"></i></a> |
+                        <a class="btn btn-danger text-white font-weight-bold" style="cursor:pointer" @onclick="@(()=>Delete(item.NguoidungID))"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public string content { get; set; }
+    public List<Nguoidung> nguoidungs;
+    public bool check { get; set; }
+
+    protected override void OnInitialized()
+    {
+        nguoidungs = _nguoidungSvc.GetNguoidungAll();
+    }
+
+    private void Delete(int id)
+    {
+        if (_nguoidungSvc.GetNguoidung(id).Role == Role.User)
+        {
+            check = true;
+            _nguoidungSvc.DeleteNguoidung(id);
+            nguoidungs = _nguoidungSvc.GetNguoidungAll();
+        }
+    }
+}

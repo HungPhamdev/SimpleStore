@@ -1,0 +1,12 @@
+﻿@page "/loginControl"
+@using System.Web;
+
+<AuthorizeView>
+    <Authorized>
+        <b class="h3 text-success font-weight-bold"><i class="far fa-smile"></i> Xin chào, @context.User.Identity.Name!</b>
+        <a class="ml-md-auto btn btn-primary font-weight-bold" href="/logout?returnUrl=/"
+           target="_top"><span class="oi oi-account-logout" aria-hidden="true"></span> Đăng Xuất</a>
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>

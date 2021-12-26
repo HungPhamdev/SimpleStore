@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\HostASMAPIC6</_PublishTargetUrl>
+    <History>True|2021-08-14T13:41:10.4041250Z;</History>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=LAPTOP-GFJR2NHF%3bInitial Catalog=AMS_C6%3bIntegrated Security=True%3bPersist Security Info=False%3bPooling=False%3bMultipleActiveResultSets=False%3bEncrypt=False%3bTrustServerCertificate=False</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

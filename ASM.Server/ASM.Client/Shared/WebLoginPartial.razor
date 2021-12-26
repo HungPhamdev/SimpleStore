@@ -1,0 +1,66 @@
+﻿@inject Blazored.SessionStorage.ISyncSessionStorageService seesionStorage
+@inject NavigationManager navigation
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link text-dark" id="cart" href="/Cart">
+            @if (cart != null && cart != "")
+            {
+                <img id="imgCart" src="images/cartA.png" style="width:30px" />
+            }
+            else
+            {
+                <img id="imgCart" src="images/cart.png" style="width:30px" />
+            }
+        </a>
+    </li>
+</ul>
+<ul class="navbar-nav" id="navLogin">
+    @if (emailAddress != null && emailAddress != "")
+    {
+        <li class="nav-item">
+            <a class="nav-link text-primary font-weight-bold" id="information" href="/Info/@khachhangId"><i class="far fa-smile"></i> Xin chào @emailAddress! |</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary font-weight-bold" id="history" href="/History"><i class="fas fa-shopping-cart"></i> Đơn hàng |</a>
+        </li>
+        <li class="nav-item">
+            <a id="logout" class="nav-link text-primary font-weight-bold" @onclick="Logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-primary font-weight-bold" id="register" href="/Register"><i class="far fa-registered"></i> Đăng ký</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary font-weight-bold" id="login" href="/Login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+        </li>
+    }
+
+</ul>
+
+@code {
+    string emailAddress;
+    string khachhangId;
+    string cart;
+    protected override async Task OnInitializedAsync()
+    {
+        emailAddress = seesionStorage.GetItem<string>("Email");
+        khachhangId = seesionStorage.GetItem<int>("KhachhangId").ToString();
+        cart = seesionStorage.GetItem<string>("cart");
+    }
+
+    protected void o()
+    {
+        emailAddress = seesionStorage.GetItem<string>("Email");
+        khachhangId = seesionStorage.GetItem<int>("KhachhangId").ToString();
+        cart = seesionStorage.GetItem<string>("cart");
+    }
+
+    protected void Logout()
+    {
+        seesionStorage.RemoveItem("AccessToken");
+        seesionStorage.RemoveItem("Email");
+        navigation.NavigateTo("/",true);
+    }
+}
